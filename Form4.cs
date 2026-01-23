@@ -12,9 +12,15 @@ namespace Projekt
 {
     public partial class Form4 : Form
     {
-        public Form4()
+
+        private Form2 _form2;
+        private Form3 _form3;
+        private Form1 _form1;
+
+        public Form4(Form1 form1)
         {
             InitializeComponent();
+            _form1 = form1; // always assign Form1 here
         }
 
         private void Form4_Load(object sender, EventArgs e)
@@ -22,15 +28,21 @@ namespace Projekt
 
         }
 
-
-        public void button1_Click(object sender, EventArgs e)
+        public void SetOtherForms(Form2 form2, Form3 form3, Form1 form1ForNavigation)
         {
-            Form1 form1 = new Form1();
-            string Name = tbName.Text;
+            _form2 = form2;
+            _form3 = form3;
+            // optional: _form1 = form1ForNavigation; // we already have _form1 from constructor
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string name = tbName.Text;
             int personen = Convert.ToInt32(tbPresonen.Text);
 
-            form1.SetButton3Color(Color.Red);
-            form1.Refresh();
+            // This will never be null now
+            _form1.SetButtonColor(Color.Red);
+
 
 
         }

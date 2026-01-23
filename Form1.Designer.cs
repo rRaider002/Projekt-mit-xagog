@@ -29,93 +29,86 @@ namespace Projekt
         /// </summary>
         private void InitializeComponent()
         {
-            this.btMenu1 = new System.Windows.Forms.Button();
-            this.btMenu2 = new System.Windows.Forms.Button();
-            this.btMenu3 = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.button3 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.label3 = new System.Windows.Forms.Label();
+            this.Menu1 = new System.Windows.Forms.Button();
+            this.Menu2 = new System.Windows.Forms.Button();
+            this.Menu3 = new System.Windows.Forms.Button();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.button4 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
-            // btMenu1
+            // label3
             // 
-            this.btMenu1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btMenu1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btMenu1.Location = new System.Drawing.Point(1780, 484);
-            this.btMenu1.Name = "btMenu1";
-            this.btMenu1.Size = new System.Drawing.Size(120, 50);
-            this.btMenu1.TabIndex = 0;
-            this.btMenu1.Text = "Menu1";
-            this.btMenu1.UseVisualStyleBackColor = false;
-            this.btMenu1.Click += new System.EventHandler(this.btMenu1_Click);
+            this.label3.AutoSize = true;
+            this.label3.ForeColor = System.Drawing.SystemColors.ControlLight;
+            this.label3.Location = new System.Drawing.Point(960, 35);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(43, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Menu 2";
             // 
-            // btMenu2
+            // Menu1
             // 
-            this.btMenu2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btMenu2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btMenu2.Location = new System.Drawing.Point(1780, 540);
-            this.btMenu2.Name = "btMenu2";
-            this.btMenu2.Size = new System.Drawing.Size(120, 50);
-            this.btMenu2.TabIndex = 1;
-            this.btMenu2.Text = "Menu2";
-            this.btMenu2.UseVisualStyleBackColor = false;
-            this.btMenu2.Click += new System.EventHandler(this.btMenu2_Click);
+            this.Menu1.Location = new System.Drawing.Point(1780, 484);
+            this.Menu1.Name = "Menu1";
+            this.Menu1.Size = new System.Drawing.Size(120, 50);
+            this.Menu1.TabIndex = 3;
+            this.Menu1.Text = "button1";
+            this.Menu1.UseVisualStyleBackColor = true;
+            this.Menu1.Click += new System.EventHandler(this.Menu1_Click);
             // 
-            // btMenu3
+            // Menu2
             // 
-            this.btMenu3.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.btMenu3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.btMenu3.Location = new System.Drawing.Point(1780, 596);
-            this.btMenu3.Name = "btMenu3";
-            this.btMenu3.Size = new System.Drawing.Size(120, 50);
-            this.btMenu3.TabIndex = 2;
-            this.btMenu3.Text = "Menu3";
-            this.btMenu3.UseVisualStyleBackColor = false;
-            this.btMenu3.Click += new System.EventHandler(this.btMenu3_Click);
+            this.Menu2.Location = new System.Drawing.Point(1780, 540);
+            this.Menu2.Name = "Menu2";
+            this.Menu2.Size = new System.Drawing.Size(120, 50);
+            this.Menu2.TabIndex = 4;
+            this.Menu2.Text = "button2";
+            this.Menu2.UseVisualStyleBackColor = true;
+            this.Menu2.Click += new System.EventHandler(this.Menu2_Click_1);
             // 
-            // label1
+            // Menu3
             // 
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.SystemColors.ControlLight;
-            this.label1.Location = new System.Drawing.Point(960, 35);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Menu 1";
+            this.Menu3.Location = new System.Drawing.Point(1780, 596);
+            this.Menu3.Name = "Menu3";
+            this.Menu3.Size = new System.Drawing.Size(120, 50);
+            this.Menu3.TabIndex = 5;
+            this.Menu3.Text = "button4";
+            this.Menu3.UseVisualStyleBackColor = true;
+            this.Menu3.Click += new System.EventHandler(this.Menu3_Click_1);
             // 
-            // pictureBox1
+            // pictureBox2
             // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.pictureBox1.Location = new System.Drawing.Point(480, 270);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1000, 550);
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.pictureBox2.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.pictureBox2.Location = new System.Drawing.Point(480, 270);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(1000, 550);
+            this.pictureBox2.TabIndex = 6;
+            this.pictureBox2.TabStop = false;
             // 
-            // button3
+            // button4
             // 
-            this.button3.Location = new System.Drawing.Point(525, 305);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(84, 46);
-            this.button3.TabIndex = 6;
-            this.button3.Text = "button3";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button4.Location = new System.Drawing.Point(511, 291);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(120, 50);
+            this.button4.TabIndex = 7;
+            this.button4.Text = "button1";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // Form1
             // 
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
             this.ClientSize = new System.Drawing.Size(1904, 1041);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.btMenu3);
-            this.Controls.Add(this.btMenu2);
-            this.Controls.Add(this.btMenu1);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.Menu3);
+            this.Controls.Add(this.Menu2);
+            this.Controls.Add(this.Menu1);
+            this.Controls.Add(this.label3);
             this.Name = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -123,15 +116,19 @@ namespace Projekt
 
         #endregion
 
-        private System.Windows.Forms.Button btTisch1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+
         private System.Windows.Forms.Button btMenu1;
         private System.Windows.Forms.Button btMenu2;
         private System.Windows.Forms.Button btMenu3;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button Menu1;
+        private System.Windows.Forms.Button Menu2;
+        private System.Windows.Forms.Button Menu3;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Button button4;
     }
 }
 

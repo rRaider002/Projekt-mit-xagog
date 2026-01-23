@@ -12,12 +12,28 @@ namespace Projekt
 {
     public partial class Form2 : Form
     {
+
+        private Form1 _form1;
+        private Form3 _form3;
+        private Form4 _form4;
+
         public Form2()
         {
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
+
         }
+
+        // Assign the other forms after creation
+        public void SetOtherForms(Form1 form1, Form3 form3, Form4 form4)
+        {
+            _form1 = form1;
+            _form3 = form3;
+            _form4 = form4;
+        }
+
+
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -32,8 +48,7 @@ namespace Projekt
         private void btMenu1_Click(object sender, EventArgs e)
         {
             this.Hide();
-            Form1 form1 = new Form1();
-            form1.Show();
+            _form1.Show();
 
         }
 
@@ -45,9 +60,9 @@ namespace Projekt
 
         private void btMenu3_Click(object sender, EventArgs e)
         {
+
             this.Hide();
-            Form3 form3 = new Form3();
-            form3.Show();
+            _form3.Show();
 
         }
     }
