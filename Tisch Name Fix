@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------------Form1------------------------------------------------------------------------------
+namespace WindowsFormsApp3
+{
+    public partial class Form1 : Form
+    {
+
+        private Form2 _form2;
+        public string Nachname { get; set; }
+        public string Buttonname { get; set; }
+
+
+        public Form1()
+        {
+            InitializeComponent();
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        public void SetOtherForms(Form2 form2)
+        {
+            _form2 = form2;
+
+        }
+
+        public void SetButtonColor(Color color)
+        {
+            button2.BackColor = color;
+        }
+
+        public void ReceiveText(string text)
+        {
+            Nachname = text;
+            button2.Text = text; 
+        }
+
+        public void ChangeButtonname(string text)
+        {
+            Buttonname = text;
+            button2.Text = text;
+        }
+        
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {  
+            _form2.Show();
+            string Buttonname = button2.Text;
+            _form2.ReceiveButtonname(Buttonname);
+        }
+    }
+}
+
+---------------------------------------------------------------------------------Form2------------------------------------------------------------------------------
+
+namespace WindowsFormsApp3
+{
+    public partial class Form2 : Form
+    {
+        private Form1 _form1;
+        public string Buttonname { get; set; }
+
+        public Form2(Form1 form1)
+        {
+            InitializeComponent();
+            _form1 = form1;
+
+
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string name = tBVorname.Text;
+            string nachname = tBNachname.Text;
+
+            _form1.ReceiveText(nachname);
+            _form1.SetButtonColor(Color.Red);
+
+        }
+
+        public void ReceiveButtonname(string text)
+        {
+            Buttonname = text;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            _form1.SetButtonColor(Color.Lime);
+            _form1.ChangeButtonname(Buttonname);
+        }
+    }
+}
+
