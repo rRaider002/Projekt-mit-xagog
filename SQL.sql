@@ -12,7 +12,6 @@ CREATE TABLE Mitarbeiter (
     Vorname varchar(50),
     Nachname varchar(50),
     Telefon varchar(50),
-    IsDeleted boolean default 0,
     passwort varchar(50),
     geburtsjahr varchar (50),
     benutzername varchar(50)
@@ -61,3 +60,4 @@ CREATE TABLE Bestellposition (
 );
 
 ALTER TABLE mitarbeiter
+DROP COLUMN IsDeleted;
