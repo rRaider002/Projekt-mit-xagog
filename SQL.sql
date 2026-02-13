@@ -9,14 +9,20 @@ CREATE TABLE Gast (
 );
 CREATE TABLE Mitarbeiter (
 	MitarbeiterID INT AUTO_INCREMENT PRIMARY KEY,
-    Vorname varchar(50),
-    Nachname varchar(50),
-    Telefon varchar(50),
-    passwort varchar(50),
-    geburtsjahr varchar (50),
-    benutzername varchar(50)
+    Vorname varchar(20),
+    Nachname varchar(20),
+    Telefon varchar(11),
+    passwort_hash varchar(25),
+    geburtsjahr varchar (4),
+    benutzername varchar(44)
     
 );
+
+Insert into Mitarbeiter (Vorname, Nachname, passwort, Telefon,geburtsjahr, benutzername)
+Values 
+('Julian','Hillebrecht','530423','01234567890','2007','JHillebrecht2007'),
+('Isa','Dagli','4002','01234567890','2004','IDagli2004');
+
 CREATE TABLE Tisch (
   TischID INT AUTO_INCREMENT PRIMARY KEY,
   Plaetze INT,
@@ -59,5 +65,4 @@ CREATE TABLE Bestellposition (
   FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID)
 );
 
-ALTER TABLE mitarbeiter
-DROP COLUMN IsDeleted;
+select * from Mitarbeiter;
