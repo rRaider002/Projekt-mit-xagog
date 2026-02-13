@@ -1,0 +1,78 @@
+Table Gast {
+  GastID int [pk, increment]
+  Vorname varchar(50)
+  Nachname varchar(50) [not null]
+  Telefon varchar(30) [not null]
+  IsDeleted boolean [not null, default: false]
+}
+
+Table Mitarbeiter {
+  MitarbeiterID int [pk, increment]
+  Vorname varchar(50) [not null]
+  Nachname varchar(50) [not null]
+  Telefon varchar(50)
+  benutzername varchar(50) [not null, unique]
+  passwort_hash varchar(255) [not null]
+  geburtsjahr int
+  IsDeleted boolean [not null, default: false]
+}
+
+Table Tisch {
+  TischID int [pk, increment]
+  Tischnummer int [not null, unique]
+  Plaetze int [not null]
+  Lage varchar(50) [not null]
+  IsDeleted boolean [not null, default: false]
+}
+
+Table Speise {
+  SpeiseID int [pk, increment]
+  Bezeichnung varchar(100) [not null]
+  Beschreibung varchar(255)
+  Preis decimal(6,2) [not null]
+  IsDeleted boolean [not null, default: false]
+}
+
+Table Reservierung {
+  ReservierungID int [pk, increment]
+  Datum date [not null]
+  Slot int [not null, note: "1..4"]
+  Personenanzahl int [not null]
+  GastID int [not null]
+  TischID int [not null]
+  IsDeleted boolean [not null, default: false]
+
+  Indexes {
+    (Datum, Slot, TischID) [unique, name: "uq_res"]
+  }
+}
+
+Table Bestellung {
+  BestellungID int [pk, increment]
+  Zeitpunkt datetime [not null]
+  Datum date [not null]
+  Slot int [not null, note: "1..4"]
+  TischID int [not null]
+  MitarbeiterID int [not null]
+  GastID int
+  IsDeleted boolean [not null, default: false]
+}
+
+Table Bestellposition {
+  BestellpositionID int [pk, increment]
+  BestellungID int [not null]
+  SpeiseID int [not null]
+  Menge int [not null]
+  Einzelpreis decimal(6,2) [not null]
+  Gesamtpreis decimal(8,2) [not null]
+}
+
+Ref: Reservierung.GastID > Gast.GastID
+Ref: Reservierung.TischID > Tisch.TischID
+
+Ref: Bestellung.TischID > Tisch.TischID
+Ref: Bestellung.MitarbeiterID > Mitarbeiter.MitarbeiterID
+Ref: Bestellung.GastID > Gast.GastID
+
+Ref: Bestellposition.BestellungID > Bestellung.BestellungID
+Ref: Bestellposition.SpeiseID > Speise.SpeiseID
