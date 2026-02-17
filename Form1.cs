@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using MySqlConnector;
 
 namespace Projekt
 {
@@ -16,8 +17,8 @@ namespace Projekt
         private Form3 _form3;
         private Form4 _form4;
         private Form5 _form5;
+        public Button _lastClickedButton;
 
-        public string Buttonname { get; set; }
         public string Nachname { get; set; }
         public Form1()
         {
@@ -45,9 +46,6 @@ namespace Projekt
             _form5 = form5;
         }
 
-
-        private Button _lastClickedButton;
-
         public void AnyButton_Click(object sender, EventArgs e)
         {
             _form4.Hide();
@@ -55,15 +53,26 @@ namespace Projekt
             _lastClickedButton = sender as Button;
                           
             _form4.Show();
+
+            string TischName = _lastClickedButton.Text;
+
+
+            SaveTischNameToDatabase(TischName);
         }
 
-        public void SetLastClickedButtonText(string text)
-        {
-            Buttonname = text;
-
-            if (_lastClickedButton != null)
+        private void SaveTischNameToDatabase(string TischName)
+        {   
+            string connStr = "server=localhost;user=root;password=root;database=vesuv";
+            using (MySqlConnection conn = new MySqlConnection(connStr))
             {
-                _lastClickedButton.Text = text;
+                conn.Open();
+                string query = "INSERT INTO tisch(TischName) values(@TischName)";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@TischName", TischName);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -78,12 +87,6 @@ namespace Projekt
         public void ReceiveText(string text)
         {
             Nachname = text;
-            _lastClickedButton.Text = text;
-        }
-
-        public void ChangeButtonname(string text)
-        {
-            Buttonname = text;
             _lastClickedButton.Text = text;
         }
 
