@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,19 +19,15 @@ namespace Projekt
 
         public string Buttonname { get; set; }
 
-        public Form4()
-        {
-            InitializeComponent();
-        }
-
         public Form4(Form1 form1)
         {
+            InitializeComponent();
             _form1 = form1;
         }
 
         private void Form4_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         public void SetOtherForms(Form2 form2, Form3 form3, Form1 form1)
@@ -89,10 +85,28 @@ namespace Projekt
             Buttonname = text;
         }
 
+        private void LoadData()
+        {
+            string connStr = "server=localhost;user=root;password=root;database=vesuv";
+            string query = "SELECT * FROM tisch";
+            {
+
+                using (MySqlConnection conn = new MySqlConnection(connStr))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    MySqlDataReader reader = cmd.ExecuteReader();
+
+
+                }
+            }
+        }
+
+
+
         private void button2_Click(object sender, EventArgs e)
         {
             _form1.SetButtonColor(Color.Lime);
-            _form1.ChangeButtonname(Buttonname);
 
             this.Hide();
         }
