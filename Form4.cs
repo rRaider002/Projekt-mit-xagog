@@ -47,9 +47,8 @@ namespace Projekt
 
             SaveNameToDatabase(name, nachname, Telefon);
 
-            _form1.SetButtonColor(Color.Red);
-
             _form1.ReceiveText(nachname);
+            _form1.SetButtonColor(Color.Red);
 
             this.Hide();
 
@@ -57,6 +56,8 @@ namespace Projekt
             tBNachname.Clear();
             tbTelefonnummer.Clear();
             tbPresonen.Clear();
+
+
 
         }
 
@@ -85,29 +86,32 @@ namespace Projekt
             Buttonname = text;
         }
 
-        private void LoadData()
+        public string LoadTableName()
         {
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
-            string query = "SELECT * FROM tisch";
+            string query = "SELECT TischName FROM tischName LIMIT 1";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
             {
+                conn.Open();
 
-                using (MySqlConnection conn = new MySqlConnection(connStr))
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-                    MySqlDataReader reader = cmd.ExecuteReader();
-
-
+                    if (reader.Read())
+                    {
+                        return reader["TischName"].ToString();
+                    }
                 }
             }
+            return null;
         }
-
-
 
         private void button2_Click(object sender, EventArgs e)
         {
             _form1.SetButtonColor(Color.Lime);
-
+            string tischName = LoadTableName();
+            _form1._lastClickedButton.Text = tischName;
             this.Hide();
         }
     }
