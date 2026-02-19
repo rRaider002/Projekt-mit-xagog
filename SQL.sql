@@ -15,7 +15,6 @@ CREATE TABLE Mitarbeiter (
     passwort_hash varchar(25),
     geburtsjahr varchar (4),
     benutzername varchar(44)
-    
 );
 
 Insert into Mitarbeiter (Vorname, Nachname, passwort, Telefon,geburtsjahr, benutzername)
@@ -27,7 +26,12 @@ CREATE TABLE Tisch (
   TischID INT AUTO_INCREMENT PRIMARY KEY,
   Plaetze INT,
   Lage VARCHAR(50),
-  IsDeleted BOOLEAN DEFAULT 0
+  istBesetzt BOOLEAN DEFAULT 0,
+  Slot INT
+);
+
+Create table TischName (
+TischName varchar (15)
 );
 CREATE TABLE Speise (
   SpeiseID INT AUTO_INCREMENT PRIMARY KEY,
@@ -65,4 +69,7 @@ CREATE TABLE Bestellposition (
   FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID)
 );
 
-select * from Mitarbeiter;
+alter table tisch
+add column Slot int;
+
+select * from tisch;
