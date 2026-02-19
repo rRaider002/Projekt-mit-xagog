@@ -114,5 +114,30 @@ namespace Projekt
             _form1._lastClickedButton.Text = tischName;
             this.Hide();
         }
+
+        private bool KannReservieren(int tischID)
+        {
+            string connStr = "server=localhost;user=root;password=root;database=vesuv";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "SELECT Slot FROM Tisch WHERE TischID = @tischID";
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@tischID", tischID);
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null)
+                    {
+                        int slot = Convert.ToInt32(result);
+                        return slot < 4; // maximal 4 Reservierungen
+                    }
+
+                    return false; // Tisch existiert nicht
+                }
+            }
+        }
     }
 }
