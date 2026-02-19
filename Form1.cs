@@ -26,11 +26,46 @@ namespace Projekt
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
 
-            button4.Click += AnyButton_Click;
-            button1.Click += AnyButton_Click;
-            button2.Click += AnyButton_Click;
-            button5.Click += AnyButton_Click;
-            button6.Click += AnyButton_Click;            
+            Tisch1.Click += AnyButton_Click;
+            Tisch2.Click += AnyButton_Click;
+            Tisch3.Click += AnyButton_Click;
+            Tisch4.Click += AnyButton_Click;
+            Tisch5.Click += AnyButton_Click;
+            Tisch6.Click += AnyButton_Click;
+            Tisch7.Click += AnyButton_Click;
+            Tisch8.Click += AnyButton_Click;
+            Tisch9.Click += AnyButton_Click;
+            Tisch10.Click += AnyButton_Click;
+            Tisch11.Click += AnyButton_Click;
+            Tisch12.Click += AnyButton_Click;
+            Tisch13.Click += AnyButton_Click;
+            Tisch14.Click += AnyButton_Click;
+            Tisch15.Click += AnyButton_Click;
+            Tisch16.Click += AnyButton_Click;
+            Tisch17.Click += AnyButton_Click;
+            Tisch18.Click += AnyButton_Click;
+            Tisch19.Click += AnyButton_Click;
+            Tisch20.Click += AnyButton_Click;
+            Tisch21.Click += AnyButton_Click;
+            Tisch22.Click += AnyButton_Click;
+            Tisch23.Click += AnyButton_Click;
+            Tisch24.Click += AnyButton_Click;
+            Tisch25.Click += AnyButton_Click;
+            Tisch26.Click += AnyButton_Click;
+            Tisch27.Click += AnyButton_Click;
+            Tisch28.Click += AnyButton_Click;
+            Tisch29.Click += AnyButton_Click;
+            Tisch30.Click += AnyButton_Click;
+            Tisch31.Click += AnyButton_Click;
+            Tisch32.Click += AnyButton_Click;
+            Tisch33.Click += AnyButton_Click;
+            Tisch34.Click += AnyButton_Click;
+            Tisch35.Click += AnyButton_Click;
+            Tisch36.Click += AnyButton_Click;
+            Tisch37.Click += AnyButton_Click;
+            Tisch38.Click += AnyButton_Click;
+            Tisch39.Click += AnyButton_Click;
+            Tisch40.Click += AnyButton_Click;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -54,19 +89,31 @@ namespace Projekt
                           
             _form4.Show();
 
-            string TischName = _lastClickedButton.Text;
+            string TischName = _lastClickedButton.Name;
 
+            string connStr = "server=localhost;user=root;password=root;database=vesuv";
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "DELETE FROM tischName";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
             SaveTischNameToDatabase(TischName);
         }
 
-        private void SaveTischNameToDatabase(string TischName)
+        public void SaveTischNameToDatabase(string TischName)
         {   
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = "INSERT INTO tisch(TischName) values(@TischName)";
+                string query = "INSERT INTO tischName(TischName) values(@TischName)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
@@ -109,33 +156,32 @@ namespace Projekt
 
         public void button4_Click(object sender, EventArgs e)
         {
-
+            
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Tisch2_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void Tisch3_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void pictureBox1_Click(object sender, EventArgs e)
         {
 
         }
 
-        private void button6_Click(object sender, EventArgs e)
+        private void pictureBox5_Click(object sender, EventArgs e)
         {
-          
+
         }
 
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
 
-
-
-
-
+        }
     }
 }
