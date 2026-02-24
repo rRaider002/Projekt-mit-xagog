@@ -1,5 +1,7 @@
 CREATE DATABASE vesuv;
 USE vesuv;
+
+
 CREATE TABLE Gast (
   GastID INT AUTO_INCREMENT PRIMARY KEY,
   Vorname VARCHAR(50),
@@ -15,24 +17,20 @@ CREATE TABLE Mitarbeiter (
     Telefon varchar(11),
     passwort varchar(25),
     geburtsjahr varchar (4),
-    benutzername varchar(44),
+    benutzername VARCHAR(44) AS (CONCAT(LEFT(Vorname,1), Nachname, geburtsjahr)) STORED,
 	IsDeleted BOOLEAN DEFAULT 0
 );
 
 
-Insert into Mitarbeiter (Vorname, Nachname, passwort, Telefon,geburtsjahr, benutzername)
-Values 
-('Julian','Hillebrecht','530423','01234567890','2007','JHillebrecht2007'),
-('Isa','Dagli','4002','01234567890','2004','IDagli2004');
-
-
 CREATE TABLE Tisch (
   TischID INT AUTO_INCREMENT PRIMARY KEY,
+  TischName varchar(15),
   Plaetze INT,
   Lage VARCHAR(50),
   istBesetzt BOOLEAN DEFAULT 0,
   Slot INT
 );
+
 
 Create table TischName (
 TischName varchar (15)
@@ -69,6 +67,8 @@ CREATE TABLE Bestellung (
   TischID INT,
   MitarbeiterID INT,
   GastID INT,
+  SpeiseID INT,
+  FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID),
   Foreign key (GastID) REFERENCES Gast(GastID),
   FOREIGN KEY (TischID) REFERENCES Tisch(TischID),
   FOREIGN KEY (MitarbeiterID) REFERENCES Mitarbeiter(MitarbeiterID)
@@ -86,6 +86,72 @@ CREATE TABLE Bestellposition (
 );
 
 
+INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort,geburtsjahr)
+VALUES
+-- Manager
+('Julian','Hillebrecht','01234567890','530423','2007'),
+('Isa','Dagli','01234567890','4002','2004'),
+-- Köche
+('Max', 'Mustermann', '01234567890', 'Max718', 1985),
+('Anna', 'Schmidt', '09876543210', 'Anna812', 1990),
+('Tom', 'Becker', '01555123456', 'Tom123', 1982),
+('Laura', 'Fischer', '01777654321', 'Laura781', 1995),
+-- Kellner
+('Sophie', 'Neumann', '01666111222', 'Sophie123', 1988),
+('Lukas', 'Keller', '01666333444', 'Lukas456', 1991),
+('Julia', 'Hoffmann', '01666555666', 'Julia789', 1983),
+('Fabian', 'Wolf', '01666777888', 'Fabian321', 1987),
+('Nina', 'Richter', '01666999000', 'Nina654', 1992),
+('Jan', 'Schulz', '01666112233', 'Jan987', 1985),
+('Lea', 'Meier', '01666445566', 'Lea147', 1990),
+('Tim', 'Fischer', '01666778899', 'Tim258', 1984);
+
+
+INSERT INTO Tisch (TischName, Plaetze ,Lage)
+VALUES
+('Tisch1',2,'Fenster'),
+('Tisch2',2,'Fenster'),
+('Tisch3',2,'Fenster'),
+('Tisch4',2,'Fenster'),
+('Tisch5',2,'Fenster'),
+('Tisch6',2,'Innenraum'),
+('Tisch7',2,'Innenraum'),
+('Tisch8',2,'Fenster'),
+('Tisch9',2,'Innenraum'),
+('Tisch10',4,'Innenraum'),
+('Tisch11',4,'Innenraum'),
+('Tisch12',4,'Innenraum'),
+('Tisch13',4,'Innenraum'),
+('Tisch14',4,'Innenraum'),
+('Tisch15',4,'Innenraum'),
+('Tisch16',4,'Innenraum'),
+('Tisch17',4,'Innenraum'),
+('Tisch18',4,'Innenraum'),
+('Tisch19',4,'Innenraum'),
+('Tisch20',4,'Innenraum'),
+('Tisch21',4,'Innenraum'),
+('Tisch22',4,'Innenraum'),
+('Tisch23',4,'Innenraum'),
+('Tisch24',4,'Innenraum'),
+('Tisch25',10,'Fenster'),
+('Tisch26',10,'Fenster'),
+('Tisch27',10,'Fenster'),
+('Tisch28',10,'Fenster'),
+('Tisch29',4,'Fenster'),
+('Tisch30',4,'Fenster'),
+('Tisch31',4,'Fenster'),
+('Tisch32',4,'Fenster'),
+('Tisch33',8,'Fenster'),
+('Tisch34',8,'Fenster'),
+('Tisch35',8,'Fenster'),
+('Tisch36',8,'Innenraum'),
+('Tisch37',8,'Fenster'),
+('Tisch38',8,'Innenraum'),
+('Tisch39',8,'Fenster'),
+('Tisch40',8,'Fenster');
+
+
+select * from tisch;
 INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType, Zutaten)
 VALUES 
 -- Speisen
