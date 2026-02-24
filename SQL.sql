@@ -17,10 +17,12 @@ CREATE TABLE Mitarbeiter (
     Telefon varchar(11),
     passwort varchar(25),
     geburtsjahr varchar (4),
+    PasswortMaskiert VARCHAR(10) AS (REPEAT('*',10)) STORED,
     benutzername VARCHAR(44) AS (CONCAT(LEFT(Vorname,1), Nachname, geburtsjahr)) STORED,
 	IsDeleted BOOLEAN DEFAULT 0
 );
 
+select * from MItarbeiter;
 
 CREATE TABLE Tisch (
   TischID INT AUTO_INCREMENT PRIMARY KEY,
@@ -151,7 +153,6 @@ VALUES
 ('Tisch40',8,'Fenster');
 
 
-select * from tisch;
 INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType, Zutaten)
 VALUES 
 -- Speisen
