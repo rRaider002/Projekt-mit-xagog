@@ -16,13 +16,13 @@ CREATE TABLE Mitarbeiter (
     Nachname varchar(20),
     Telefon varchar(11),
     passwort varchar(25),
+    Password VARCHAR(10) AS (REPEAT('*',10)) STORED,
     geburtsjahr varchar (4),
-    PasswortMaskiert VARCHAR(10) AS (REPEAT('*',10)) STORED,
+    bereich varchar (25),
     benutzername VARCHAR(44) AS (CONCAT(LEFT(Vorname,1), Nachname, geburtsjahr)) STORED,
 	IsDeleted BOOLEAN DEFAULT 0
 );
 
-select * from MItarbeiter;
 
 CREATE TABLE Tisch (
   TischID INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,13 +30,10 @@ CREATE TABLE Tisch (
   Plaetze INT,
   Lage VARCHAR(50),
   istBesetzt BOOLEAN DEFAULT 0,
-  Slot INT
+  Slot INT DEFAULT 0
 );
 
-
-Create table TischName (
-TischName varchar (15)
-);
+select * From Tisch;
 
 
 CREATE TABLE Speise (
@@ -88,25 +85,25 @@ CREATE TABLE Bestellposition (
 );
 
 
-INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort,geburtsjahr)
+INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort,geburtsjahr, bereich)
 VALUES
 -- Manager
-('Julian','Hillebrecht','01234567890','530423','2007'),
-('Isa','Dagli','01234567890','4002','2004'),
+('Julian','Hillebrecht','01234567890','530423','2007','Manager'),
+('Isa','Dagli','01234567890','4002','2004','Manager'),
 -- Köche
-('Max', 'Mustermann', '01234567890', 'Max718', 1985),
-('Anna', 'Schmidt', '09876543210', 'Anna812', 1990),
-('Tom', 'Becker', '01555123456', 'Tom123', 1982),
-('Laura', 'Fischer', '01777654321', 'Laura781', 1995),
+('Max', 'Mustermann', '01234567890', 'Max718', 1985,'Koch'),
+('Anna', 'Schmidt', '09876543210', 'Anna812', 1990,'Koch'),
+('Tom', 'Becker', '01555123456', 'Tom123', 1982,'Koch'),
+('Laura', 'Fischer', '01777654321', 'Laura781', 1995,'Koch'),
 -- Kellner
-('Sophie', 'Neumann', '01666111222', 'Sophie123', 1988),
-('Lukas', 'Keller', '01666333444', 'Lukas456', 1991),
-('Julia', 'Hoffmann', '01666555666', 'Julia789', 1983),
-('Fabian', 'Wolf', '01666777888', 'Fabian321', 1987),
-('Nina', 'Richter', '01666999000', 'Nina654', 1992),
-('Jan', 'Schulz', '01666112233', 'Jan987', 1985),
-('Lea', 'Meier', '01666445566', 'Lea147', 1990),
-('Tim', 'Fischer', '01666778899', 'Tim258', 1984);
+('Sophie', 'Neumann', '01666111222', 'Sophie123', 1988,'Kellner'),
+('Lukas', 'Keller', '01666333444', 'Lukas456', 1991,'Kellner'),
+('Julia', 'Hoffmann', '01666555666', 'Julia789', 1983,'Kellner'),
+('Fabian', 'Wolf', '01666777888', 'Fabian321', 1987,'Kellner'),
+('Nina', 'Richter', '01666999000', 'Nina654', 1992,'Kellner'),
+('Jan', 'Schulz', '01666112233', 'Jan987', 1985,'Kellner'),
+('Lea', 'Meier', '01666445566', 'Lea147', 1990,'Kellner'),
+('Tim', 'Fischer', '01666778899', 'Tim258', 1984,'Kellner');
 
 
 INSERT INTO Tisch (TischName, Plaetze ,Lage)
@@ -230,3 +227,38 @@ VALUES
 ('Profiteroles', 'Brandteigkugeln gefüllt mit Sahne und Schokolade', 6.80, 'Dessert', 'Brandteig, Sahne, Schokolade'),
 ('Creme Brûlée', 'Karamellisierte Vanillecreme', 6.90, 'Dessert', 'Sahne, Zucker, Eigelb, Vanille'),
 ('Obstsalat', 'Frischer Obstsalat der Saison', 5.50, 'Dessert', 'Äpfel, Birnen, Trauben, Kiwi, Orange, Honig');
+
+
+-- Umsatz Tag
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS TagesUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE DATE(Bestellung.Zeitpunkt) = CURDATE();
+
+
+-- Umsatz Woche
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS WochenUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEARWEEK(Bestellung.Zeitpunkt, 1) = YEARWEEK(CURDATE(), 1);
+
+
+-- Umsatz Monat
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS MonatsUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEAR(Bestellung.Zeitpunkt) = YEAR(CURDATE())
+AND MONTH(Bestellung.Zeitpunkt) = MONTH(CURDATE());
+  
+  
+-- Umsatz Jahr  
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS JahresUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEAR(Bestellung.Zeitpunkt) = YEAR(CURDATE());
+
+
+-- Umsatz Insgesant
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS GesamtUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID;
