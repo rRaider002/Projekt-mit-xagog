@@ -13,7 +13,6 @@ namespace Projekt
 {
     public partial class Form2 : Form
     {
-
         private Form1 _form1;
         private Form3 _form3;
         private Form4 _form4;
@@ -23,7 +22,6 @@ namespace Projekt
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
-
         }
 
         // Assign the other forms after creation
@@ -50,7 +48,6 @@ namespace Projekt
         {
             this.Hide();
             _form1.Show();
-
         }
 
         private void btMenu2_Click(object sender, EventArgs e)
@@ -61,16 +58,11 @@ namespace Projekt
 
         private void btMenu3_Click(object sender, EventArgs e)
         {
-
             this.Hide();
             _form3.Show();
-
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            
-        }
+
 
         private void tB_TextChanged(object sender, EventArgs e)
         {
@@ -80,47 +72,52 @@ namespace Projekt
         private void bTMitarbeiterErstellen_Click(object sender, EventArgs e)
         {
             string Vorname = tBName.Text;
+            char[] Vorname2 = Vorname.ToCharArray();
             string Nachname = tBNachname.Text;
             string Geburtsjahr = tBjahr.Text;
             string Telefonnummer = tBTelefon.Text;
             string Passwort = tBPasswort.Text;
-            string Benutzername = Vorname + Nachname + Geburtsjahr;
+            string Bereich = tBBereich.Text;
+            
 
-            SaveMitarbeiterToDatabase(Vorname, Nachname, Geburtsjahr, Telefonnummer, Passwort, Benutzername);
+            string Benutzername = Vorname2[0] + Nachname + Geburtsjahr;
+
+            SaveMitarbeiterToDatabase(Vorname, Nachname, Telefonnummer, Passwort, Geburtsjahr, Bereich);
 
             LoadData();
         }
 
-        private void SaveMitarbeiterToDatabase(string Vorname, string Nachname, string Telefonnummer, string Passwort, string Geburtsjahr, string Benutzername)
+        private void SaveMitarbeiterToDatabase(string Vorname, string Nachname, string Telefonnummer, string Passwort, string Geburtsjahr, string Bereich)
         {
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
-                string query = "INSERT INTO mitarbeiter(Vorname, Nachname, Telefon, passwort, geburtsjahr, benutzername) VALUES(@Vorname, @Nachname, @Telefon, @passwort, @geburtsjahr, @benutzername)";
+                string query = @"
+            INSERT INTO mitarbeiter
+                (Vorname, Nachname, Telefon, passwort, geburtsjahr, bereich)
+            VALUES
+                (@Vorname, @Nachname, @Telefon, @Passwort, @Geburtsjahr, @Bereich)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
-
                     cmd.Parameters.AddWithValue("@Vorname", Vorname);
                     cmd.Parameters.AddWithValue("@Nachname", Nachname);
                     cmd.Parameters.AddWithValue("@Telefon", Telefonnummer);
-                    cmd.Parameters.AddWithValue("@passwort", Passwort);
-                    cmd.Parameters.AddWithValue("@geburtsjahr", int.Parse(Geburtsjahr));
-                    cmd.Parameters.AddWithValue("@benutzername", Benutzername);
-
+                    cmd.Parameters.AddWithValue("@Passwort", Passwort);
+                    cmd.Parameters.AddWithValue("@Geburtsjahr", Geburtsjahr);
+                    cmd.Parameters.AddWithValue("@Bereich", Bereich);
 
                     cmd.ExecuteNonQuery();
                 }
             }
-
-
         }
 
         private void LoadData()
         {
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
-            string query = "SELECT * FROM mitarbeiter";
+            string query = @"SELECT MitarbeiterID, Vorname, Nachname, Telefon, geburtsjahr, bereich, benutzername, Password, IsDeleted FROM mitarbeiter";
+
             { 
 
                 using (MySqlConnection conn = new MySqlConnection(connStr))
@@ -136,7 +133,6 @@ namespace Projekt
                     dataGridView1.DataSource = table;
                 }
             }
-
         }
 
         private void btLoeschen_Click(object sender, EventArgs e)
@@ -158,6 +154,11 @@ namespace Projekt
 
                 LoadData();
             }
+        }
+
+        private void tBBereich_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
