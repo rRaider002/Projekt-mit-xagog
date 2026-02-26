@@ -86,25 +86,12 @@ namespace Projekt
             _form4.Hide();
 
             _lastClickedButton = sender as Button;
-                          
+
+            _form4.SetTischName(_lastClickedButton.Name);
+
             _form4.Show();
 
-            string TischName = _lastClickedButton.Name;
 
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = "DELETE FROM tischName";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-            }
-
-            SaveTischNameToDatabase(TischName);
         }
 
         public void SaveTischNameToDatabase(string TischName)
@@ -122,6 +109,8 @@ namespace Projekt
                 }
             }
         }
+
+
 
         public void SetButtonColor(Color color)
         {
