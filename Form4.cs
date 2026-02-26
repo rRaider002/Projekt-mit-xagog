@@ -23,6 +23,7 @@ namespace Projekt
         {
             InitializeComponent();
             _form1 = form1;
+
         }
 
         private void Form4_Load(object sender, EventArgs e)
@@ -36,30 +37,73 @@ namespace Projekt
             _form3 = form3;
         }
 
+        private string _tischName;
+
+
+        public void SetTischName(string name)
+        {
+            _tischName = name;
+        }
+
+
+        private int GetTischID()
+        {
+            string connStr = "server=localhost;user=root;password=root;database=vesuv";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            {
+                conn.Open();
+
+                string query = "SELECT TischID FROM Tisch WHERE TischName = @name";
+
+                using (MySqlCommand cmd = new MySqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@name", _tischName);
+
+                    object result = cmd.ExecuteScalar();
+
+                    if (result != null)
+                        return Convert.ToInt32(result);
+                }
+            }
+
+            return -1;
+        }
+
+
         private void button1_Click(object sender, EventArgs e)
         {
+            string Nachname = tBNachname.Text;
 
-            string name = tbName.Text;
-            string nachname = tBNachname.Text;
-            string Telefon = tbTelefonnummer.Text;
-            
-            int personen = Convert.ToInt32(tbPresonen.Text);
+            int tischID = GetTischID();
 
-            SaveNameToDatabase(name, nachname, Telefon);
+            if (tischID == -1)
+            {
+                MessageBox.Show("Tisch nicht gefunden!");
+                return;
+            }
 
-            _form1.ReceiveText(nachname);
+            if (!KannReservieren(tischID))
+            {
+                MessageBox.Show("Maximale Reservierungen erreicht!");
+                return;
+            }
+
+            SaveNameToDatabase(tbName.Text, tBNachname.Text, tbTelefonnummer.Text);
+
+            UpdateTischStatus();
+
             _form1.SetButtonColor(Color.Red);
-
-            this.Hide();
+            _form1._lastClickedButton.Text = Nachname;
 
             tbName.Clear();
             tBNachname.Clear();
             tbTelefonnummer.Clear();
             tbPresonen.Clear();
 
-
-
+            this.Hide();
         }
+
 
         private void SaveNameToDatabase(string name, string nachname, string Telefon)
         {
@@ -81,39 +125,37 @@ namespace Projekt
         }
 
 
-        public void ReceiveButtonname(string text)
-        {
-            Buttonname = text;
-        }
-
-        public string LoadTableName()
+        private void UpdateTischStatus()
         {
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
-            string query = "SELECT TischName FROM tischName LIMIT 1";
 
             using (MySqlConnection conn = new MySqlConnection(connStr))
             {
                 conn.Open();
 
+                string query = @"
+                UPDATE Tisch 
+                SET istBesetzt = 1,
+                Slot = Slot + 1
+                WHERE TischName = @name";
+
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
-                    {
-                        return reader["TischName"].ToString();
-                    }
+                    cmd.Parameters.AddWithValue("@name", _tischName);
+                    cmd.ExecuteNonQuery();
                 }
             }
-            return null;
         }
-
+      
+        
         private void button2_Click(object sender, EventArgs e)
         {
             _form1.SetButtonColor(Color.Lime);
-            string tischName = LoadTableName();
+            string tischName = _form1._lastClickedButton.Name;
             _form1._lastClickedButton.Text = tischName;
             this.Hide();
         }
+
 
         private bool KannReservieren(int tischID)
         {
@@ -132,12 +174,36 @@ namespace Projekt
                     if (result != null)
                     {
                         int slot = Convert.ToInt32(result);
-                        return slot < 4; // maximal 4 Reservierungen
+                        return slot < 4;
                     }
 
-                    return false; // Tisch existiert nicht
+                    return false; 
                 }
             }
         }
+
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            dateTimePicker1.Format = DateTimePickerFormat.Short;
+        }
+
+
+        private void dateTimePicker2_ValueChanged_1(object sender, EventArgs e)
+        {
+            dateTimePicker2.Format = DateTimePickerFormat.Custom;
+            dateTimePicker2.CustomFormat = "HH:mm";
+            dateTimePicker2.ShowUpDown = true;
+        }
+
+
+        private void dateTimePicker3_ValueChanged(object sender, EventArgs e)
+        {
+            dateTimePicker3.Format = DateTimePickerFormat.Custom;
+            dateTimePicker3.CustomFormat = "HH:mm";
+            dateTimePicker3.ShowUpDown = true;
+        }
+
+
     }
 }
