@@ -2,90 +2,107 @@ CREATE DATABASE vesuv;
 USE vesuv;
 
 
+-- =========================
+-- GAST
+-- =========================
 CREATE TABLE Gast (
   GastID INT AUTO_INCREMENT PRIMARY KEY,
-  Vorname VARCHAR(50),
-  Nachname VARCHAR(50),
-  Telefon VARCHAR(30)
-);
-
-
-CREATE TABLE Mitarbeiter (
-	MitarbeiterID INT AUTO_INCREMENT PRIMARY KEY,
-    Vorname varchar(20),
-    Nachname varchar(20),
-    Telefon varchar(11),
-    passwort varchar(25),
-    Password VARCHAR(10) AS (REPEAT('*',10)) STORED,
-    geburtsjahr varchar (4),
-    bereich varchar (25),
-    benutzername VARCHAR(44) AS (CONCAT(LEFT(Vorname,1), Nachname, geburtsjahr)) STORED,
-	IsDeleted BOOLEAN DEFAULT 0
-);
-
-
-CREATE TABLE Tisch (
-  TischID INT AUTO_INCREMENT PRIMARY KEY,
-  TischName varchar(15),
-  Plaetze INT,
-  Lage VARCHAR(50),
-  istBesetzt BOOLEAN DEFAULT 0,
-  Slot INT DEFAULT 0
-);
-
-select * From Tisch;
-
-
-CREATE TABLE Speise (
-  SpeiseID INT AUTO_INCREMENT PRIMARY KEY,
-  Bezeichnung VARCHAR(100),
-  Beschreibung VARCHAR(255),
-  Preis DECIMAL(6,2),
-  SpeiseType Varchar(25),
-  Zutaten Varchar (100),
+  Vorname VARCHAR(50) NOT NULL,
+  Nachname VARCHAR(50) NOT NULL,
+  Telefon VARCHAR(30) NOT NULL,
   IsDeleted BOOLEAN DEFAULT 0
 );
 
+-- =========================
+-- MITARBEITER
+-- =========================
+CREATE TABLE Mitarbeiter (
+  MitarbeiterID INT AUTO_INCREMENT PRIMARY KEY,
+  Vorname VARCHAR(20) NOT NULL,
+  Nachname VARCHAR(20) NOT NULL,
+  Telefon VARCHAR(11),
+  passwort_hash VARCHAR(255) NOT NULL,
+  geburtsjahr VARCHAR(4),
+  bereich VARCHAR(25),
+  IsDeleted BOOLEAN DEFAULT 0
+);
 
+-- =========================
+-- TISCH
+-- =========================
+CREATE TABLE Tisch (
+  TischID INT AUTO_INCREMENT PRIMARY KEY,
+  TischName VARCHAR(15) NOT NULL UNIQUE,
+  Plaetze INT NOT NULL,
+  Lage VARCHAR(50),
+  istBesetzt BOOLEAN DEFAULT 0, 
+  Slot INT DEFAULT 0
+);
+
+-- =========================
+-- SPEISE
+-- =========================
+CREATE TABLE Speise (
+  SpeiseID INT AUTO_INCREMENT PRIMARY KEY,
+  Bezeichnung VARCHAR(100) NOT NULL,
+  Beschreibung VARCHAR(255),
+  Preis DECIMAL(6,2) NOT NULL,
+  SpeiseType VARCHAR(25),
+  Zutaten VARCHAR(100),
+  IsDeleted BOOLEAN DEFAULT 0
+);
+
+-- =========================
+-- RESERVIERUNG
+-- =========================
 CREATE TABLE Reservierung (
   ReservierungID INT AUTO_INCREMENT PRIMARY KEY,
-  Datum DATE,
-  Slot INT,
-  Personenanzahl INT,
-  GastID INT,
-  TischID INT,
+  Datum DATE NOT NULL,
+  Slot INT NOT NULL,
+  Personenanzahl INT NOT NULL,
+  GastID INT NOT NULL,
+  TischID INT NOT NULL,
   IsDeleted BOOLEAN DEFAULT 0,
+
   FOREIGN KEY (GastID) REFERENCES Gast(GastID),
-  FOREIGN KEY (TischID) REFERENCES Tisch(TischID)
+  FOREIGN KEY (TischID) REFERENCES Tisch(TischID),
+
+  -- Verhindert doppelte Reservierung für gleichen Tisch/Slot/Tag
+  UNIQUE (Datum, Slot, TischID)
 );
 
-
+-- =========================
+-- BESTELLUNG (Kopf)
+-- =========================
 CREATE TABLE Bestellung (
   BestellungID INT AUTO_INCREMENT PRIMARY KEY,
-  Zeitpunkt DATETIME,
-  TischID INT,
-  MitarbeiterID INT,
-  GastID INT,
-  SpeiseID INT,
-  FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID),
-  Foreign key (GastID) REFERENCES Gast(GastID),
+  Zeitpunkt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  TischID INT NOT NULL,
+  MitarbeiterID INT NOT NULL,
+  GastID INT NOT NULL,
+
   FOREIGN KEY (TischID) REFERENCES Tisch(TischID),
-  FOREIGN KEY (MitarbeiterID) REFERENCES Mitarbeiter(MitarbeiterID)
+  FOREIGN KEY (MitarbeiterID) REFERENCES Mitarbeiter(MitarbeiterID),
+  FOREIGN KEY (GastID) REFERENCES Gast(GastID)
 );
 
-
+-- =========================
+-- BESTELLPOSITION (Positionen)
+-- =========================
 CREATE TABLE Bestellposition (
   BestellpositionID INT AUTO_INCREMENT PRIMARY KEY,
-  BestellungID INT,
-  SpeiseID INT,
-  Menge INT,
-  Einzelpreis DECIMAL(6,2),
+  BestellungID INT NOT NULL,
+  SpeiseID INT NOT NULL,
+  Menge INT NOT NULL DEFAULT 1,
+  Einzelpreis DECIMAL(6,2) NOT NULL,
+
   FOREIGN KEY (BestellungID) REFERENCES Bestellung(BestellungID),
   FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID)
 );
 
 
-INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort,geburtsjahr, bereich)
+
+INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort_hash,geburtsjahr, bereich)
 VALUES
 -- Manager
 ('Julian','Hillebrecht','01234567890','530423','2007','Manager'),
