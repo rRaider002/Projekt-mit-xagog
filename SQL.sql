@@ -69,7 +69,11 @@ CREATE TABLE Reservierung (
 
   -- Verhindert doppelte Reservierung für gleichen Tisch/Slot/Tag
   UNIQUE (Datum, Slot, TischID)
+
 );
+
+ALTER TABLE Reservierung
+ADD COLUMN Uhrzeit TIME NOT NULL;
 
 -- =========================
 -- BESTELLUNG (Kopf)
