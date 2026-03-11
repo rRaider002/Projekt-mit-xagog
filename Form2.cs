@@ -22,6 +22,41 @@ namespace Projekt
             InitializeComponent();
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
+
+            tBName.KeyPress += NurBuchstaben_KeyPress;
+            tBName.TextChanged += tBName_TextChanged;
+
+            tBNachname.KeyPress += NurBuchstaben_KeyPress;
+            tBNachname.TextChanged += tBNachname_TextChanged;
+
+            tBTelefon.KeyPress += NurZahlen_KeyPress;
+            tBTelefon.TextChanged += tBTelefon_TextChanged;
+
+            tBjahr.KeyPress += NurZahlen_KeyPress;
+            tBjahr.TextChanged += tB_TextChanged;
+
+            tBTelefon.MaxLength = 20;
+            tBjahr.MaxLength = 4;
+
+            tBBereich.Items.Add("Manager");
+            tBBereich.Items.Add("Koch");
+            tBBereich.Items.Add("Kellner");
+        }
+
+        public void NurBuchstaben_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != ' ')
+            {
+                e.Handled = true;
+            }
+        }
+
+        public void NurZahlen_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true;
+            }
         }
 
         // Assign the other forms after creation
@@ -58,8 +93,7 @@ namespace Projekt
 
         private void btMenu3_Click(object sender, EventArgs e)
         {
-            this.Hide();
-            _form3.Show();
+
         }
 
 
@@ -94,17 +128,17 @@ namespace Projekt
             {
                 conn.Open();
                 string query = @"
-            INSERT INTO mitarbeiter
-                (Vorname, Nachname, Telefon, passwort, geburtsjahr, bereich)
-            VALUES
-                (@Vorname, @Nachname, @Telefon, @Passwort, @Geburtsjahr, @Bereich)";
+                INSERT INTO mitarbeiter
+                (Vorname, Nachname, Telefon, passwort_hash, geburtsjahr, bereich)
+                VALUES
+                (@Vorname, @Nachname, @Telefon, @passwort_hash, @Geburtsjahr, @Bereich)";
 
                 using (MySqlCommand cmd = new MySqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@Vorname", Vorname);
                     cmd.Parameters.AddWithValue("@Nachname", Nachname);
                     cmd.Parameters.AddWithValue("@Telefon", Telefonnummer);
-                    cmd.Parameters.AddWithValue("@Passwort", Passwort);
+                    cmd.Parameters.AddWithValue("@passwort_hash", Passwort);
                     cmd.Parameters.AddWithValue("@Geburtsjahr", Geburtsjahr);
                     cmd.Parameters.AddWithValue("@Bereich", Bereich);
 
@@ -116,7 +150,7 @@ namespace Projekt
         private void LoadData()
         {
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
-            string query = @"SELECT MitarbeiterID, Vorname, Nachname, Telefon, geburtsjahr, bereich, benutzername, Password, IsDeleted FROM mitarbeiter";
+            string query = @"SELECT MitarbeiterID, Vorname, Nachname, Telefon, geburtsjahr, bereich, Passwort_hash, IsDeleted FROM mitarbeiter";
 
             { 
 
@@ -142,7 +176,7 @@ namespace Projekt
                 int MitarbeiterID = Convert.ToInt32(dataGridView1.CurrentRow.Cells["MitarbeiterID"].Value);
 
                 string connStr = "server=localhost;user=root;password=root;database=vesuv";
-                string query = "DELETE FROM mitarbeiter WHERE MitarbeiterID = @MitarbeiterID";
+                string query = "UPDATE mitarbeiter SET IsDeleted = 1 WHERE MitarbeiterID = @MitarbeiterID";
 
                 using (MySqlConnection conn = new MySqlConnection(connStr))
                 {
@@ -157,6 +191,36 @@ namespace Projekt
         }
 
         private void tBBereich_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void tBName_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tBBereich_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tBBereich.DropDownStyle = ComboBoxStyle.DropDownList;
+        }
+
+        private void tBNachname_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tBTelefon_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tBPasswort_TextChanged(object sender, EventArgs e)
         {
 
         }
