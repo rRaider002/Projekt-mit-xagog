@@ -20,9 +20,9 @@ CREATE TABLE Mitarbeiter (
   MitarbeiterID INT AUTO_INCREMENT PRIMARY KEY,
   Vorname VARCHAR(20) NOT NULL,
   Nachname VARCHAR(20) NOT NULL,
-  Telefon VARCHAR(11),
+  Telefon VARCHAR(20),
   passwort_hash VARCHAR(255) NOT NULL,
-  geburtsjahr VARCHAR(4),
+  geburtsjahr YEAR,
   bereich VARCHAR(25),
   IsDeleted BOOLEAN DEFAULT 0
 );
@@ -36,7 +36,9 @@ CREATE TABLE Tisch (
   Plaetze INT NOT NULL,
   Lage VARCHAR(50),
   istBesetzt BOOLEAN DEFAULT 0, 
-  Slot INT DEFAULT 0
+  Slot INT DEFAULT 0,
+  KellnerID INT NOT NULL,
+  FOREIGN KEY (KellnerID) REFERENCES Mitarbeiter(MitarbeiterID)
 );
 
 -- =========================
@@ -57,23 +59,19 @@ CREATE TABLE Speise (
 -- =========================
 CREATE TABLE Reservierung (
   ReservierungID INT AUTO_INCREMENT PRIMARY KEY,
-  Datum DATE NOT NULL,
-  Slot INT NOT NULL,
-  Personenanzahl INT NOT NULL,
-  GastID INT NOT NULL,
   TischID INT NOT NULL,
+  Slot INT NOT NULL,
+  GastID INT NOT NULL,
+  Datum DATE NOT NULL,
+  Uhrzeit TIME NOT NULL,
+  Personenanzahl INT NOT NULL,
   IsDeleted BOOLEAN DEFAULT 0,
 
   FOREIGN KEY (GastID) REFERENCES Gast(GastID),
-  FOREIGN KEY (TischID) REFERENCES Tisch(TischID),
+  FOREIGN KEY (TischID) REFERENCES Tisch(TischID)
+);	
 
-  -- Verhindert doppelte Reservierung für gleichen Tisch/Slot/Tag
-  UNIQUE (Datum, Slot, TischID)
 
-);
-
-ALTER TABLE Reservierung
-ADD COLUMN Uhrzeit TIME NOT NULL;
 
 -- =========================
 -- BESTELLUNG (Kopf)
@@ -121,54 +119,53 @@ VALUES
 ('Lukas', 'Keller', '01666333444', 'Lukas456', 1991,'Kellner'),
 ('Julia', 'Hoffmann', '01666555666', 'Julia789', 1983,'Kellner'),
 ('Fabian', 'Wolf', '01666777888', 'Fabian321', 1987,'Kellner'),
-('Nina', 'Richter', '01666999000', 'Nina654', 1992,'Kellner'),
-('Jan', 'Schulz', '01666112233', 'Jan987', 1985,'Kellner'),
-('Lea', 'Meier', '01666445566', 'Lea147', 1990,'Kellner'),
-('Tim', 'Fischer', '01666778899', 'Tim258', 1984,'Kellner');
+('Nina', 'Richter', '01666999000', 'Nina654', 1992,'Kellner');
+
+	
 
 
-INSERT INTO Tisch (TischName, Plaetze ,Lage)
+INSERT INTO Tisch (TischName, Plaetze, Lage, KellnerID)
 VALUES
-('Tisch1',2,'Fenster'),
-('Tisch2',2,'Fenster'),
-('Tisch3',2,'Fenster'),
-('Tisch4',2,'Fenster'),
-('Tisch5',2,'Fenster'),
-('Tisch6',2,'Innenraum'),
-('Tisch7',2,'Innenraum'),
-('Tisch8',2,'Fenster'),
-('Tisch9',2,'Innenraum'),
-('Tisch10',4,'Innenraum'),
-('Tisch11',4,'Innenraum'),
-('Tisch12',4,'Innenraum'),
-('Tisch13',4,'Innenraum'),
-('Tisch14',4,'Innenraum'),
-('Tisch15',4,'Innenraum'),
-('Tisch16',4,'Innenraum'),
-('Tisch17',4,'Innenraum'),
-('Tisch18',4,'Innenraum'),
-('Tisch19',4,'Innenraum'),
-('Tisch20',4,'Innenraum'),
-('Tisch21',4,'Innenraum'),
-('Tisch22',4,'Innenraum'),
-('Tisch23',4,'Innenraum'),
-('Tisch24',4,'Innenraum'),
-('Tisch25',10,'Fenster'),
-('Tisch26',10,'Fenster'),
-('Tisch27',10,'Fenster'),
-('Tisch28',10,'Fenster'),
-('Tisch29',4,'Fenster'),
-('Tisch30',4,'Fenster'),
-('Tisch31',4,'Fenster'),
-('Tisch32',4,'Fenster'),
-('Tisch33',8,'Fenster'),
-('Tisch34',8,'Fenster'),
-('Tisch35',8,'Fenster'),
-('Tisch36',8,'Innenraum'),
-('Tisch37',8,'Fenster'),
-('Tisch38',8,'Innenraum'),
-('Tisch39',8,'Fenster'),
-('Tisch40',8,'Fenster');
+('Tisch1',2,'Fenster',7),
+('Tisch2',2,'Fenster',7),
+('Tisch3',2,'Fenster',7),
+('Tisch4',2,'Fenster',7),
+('Tisch5',2,'Fenster',7),
+('Tisch6',2,'Innenraum',7),
+('Tisch7',2,'Innenraum',7),
+('Tisch8',2,'Fenster',7),
+('Tisch9',4,'Innenraum',8),
+('Tisch10',4,'Innenraum',8),
+('Tisch11',4,'Innenraum',8),
+('Tisch12',4,'Innenraum',8),
+('Tisch13',4,'Innenraum',8),
+('Tisch14',4,'Innenraum',8),
+('Tisch15',4,'Innenraum',8),
+('Tisch16',4,'Innenraum',8),
+('Tisch17',4,'Innenraum',9),
+('Tisch18',4,'Innenraum',9),
+('Tisch19',4,'Innenraum',9),
+('Tisch20',4,'Innenraum',9),
+('Tisch21',4,'Innenraum',9),
+('Tisch22',4,'Innenraum',9),
+('Tisch23',4,'Innenraum',9),
+('Tisch24',4,'Innenraum',9),
+('Tisch25',10,'Fenster',10),
+('Tisch26',10,'Fenster',10),
+('Tisch27',10,'Fenster',10),
+('Tisch28',10,'Fenster',10),
+('Tisch29',4,'Fenster',10),
+('Tisch30',4,'Fenster',10),
+('Tisch31',4,'Fenster',10),
+('Tisch32',4,'Fenster',10),
+('Tisch33',8,'Fenster',11),
+('Tisch34',8,'Fenster',11),
+('Tisch35',8,'Fenster',11),
+('Tisch36',8,'Innenraum',11),
+('Tisch37',8,'Fenster',11),
+('Tisch38',8,'Innenraum',11),
+('Tisch39',8,'Fenster',11),
+('Tisch40',8,'Fenster',11);
 
 
 INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType, Zutaten)
