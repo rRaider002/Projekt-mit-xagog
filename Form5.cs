@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -11,7 +11,7 @@ using MySqlConnector;
 
 namespace Projekt
 {
-    public partial class Form5 : Form
+    public partial class Login : Form
     {
 
         private Form1 _form1;
@@ -22,9 +22,10 @@ namespace Projekt
 
         }
 
-        public Form5()
+        public Login()
         {
             InitializeComponent();
+            this.AcceptButton = button1;
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -44,7 +45,7 @@ namespace Projekt
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string benutzername = textBox1.Text;
+            string mitarbeiterID = textBox1.Text;
             string passwort = textBox2.Text;
 
             string connStr = "server=localhost;user=root;password=root;database=vesuv";
@@ -55,11 +56,11 @@ namespace Projekt
                 {
                     conn.Open();
 
-                    string query = "SELECT COUNT(*) FROM mitarbeiter WHERE benutzername=@benutzername AND passwort=@passwort";
+                    string query = "SELECT COUNT(*) FROM Mitarbeiter WHERE MitarbeiterID=@MitarbeiterID AND passwort_hash=@passwort_hash";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@benutzername", benutzername);
-                    cmd.Parameters.AddWithValue("@passwort", passwort);
+                    cmd.Parameters.AddWithValue("@MitarbeiterID", mitarbeiterID);
+                    cmd.Parameters.AddWithValue("@passwort_hash", passwort);
 
                     int count = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -77,6 +78,32 @@ namespace Projekt
                 {
                     MessageBox.Show("Fehler: " + ex.Message);
                 }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (textBox2.UseSystemPasswordChar == true)
+            {
+                textBox2.UseSystemPasswordChar = false;
+            }
+            else
+            {
+                textBox2.UseSystemPasswordChar = true;
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            textBox1.KeyPress += NurZahlen_KeyPress;
+            textBox1.TextChanged += textBox1_TextChanged;
+        }
+
+        public void NurZahlen_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
+            {
+                e.Handled = true;
             }
         }
     }
