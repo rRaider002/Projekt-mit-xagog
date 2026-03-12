@@ -50,6 +50,7 @@ CREATE TABLE Speise (
   Beschreibung VARCHAR(255),
   Preis DECIMAL(6,2) NOT NULL,
   SpeiseType VARCHAR(25),
+  Kategorie varchar(25),
   Zutaten VARCHAR(100),
   IsDeleted BOOLEAN DEFAULT 0
 );
@@ -168,7 +169,7 @@ VALUES
 ('Tisch40',8,'Fenster',11);
 
 
-INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType, Zutaten)
+INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType,Kategorie, Zutaten)
 VALUES 
 -- Speisen
 
