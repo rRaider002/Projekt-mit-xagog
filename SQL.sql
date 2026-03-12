@@ -202,10 +202,6 @@ VALUES
 ('Antipasti Misti', 'Gemischte italienische Vorspeisenplatte', 13.50, 'Vorspeise', 'Gegrilltes Gemüse, Oliven, Salami, Käse'),
 ('Gegrillte Zucchini', 'Marinierte und gegrillte Zucchinischeiben', 7.20, 'Vorspeise', 'Zucchini, Olivenöl, Knoblauch, Kräuter'),
 ('Gegrillte Paprika', 'Marinierte Paprika mit Olivenöl', 7.20, 'Vorspeise', 'Paprika, Olivenöl, Knoblauch, Kräuter'),
-('Olivenmix', 'Verschiedene marinierte Oliven', 5.50, 'Vorspeise', 'Grüne Oliven, Schwarze Oliven, Kräuter'),
-('Mozzarella Sticks', 'Frittierte Mozzarellasticks mit Dip', 6.90, 'Vorspeise', 'Mozzarella, Paniermehl, Tomatendip'),
-('Prosciutto e Melone', 'Parmaschinken mit Honigmelone', 9.80, 'Vorspeise', 'Parmaschinken, Honigmelone'),
-('Focaccia', 'Italienisches Fladenbrot mit Rosmarin', 5.90, 'Vorspeise', 'Mehl, Hefe, Olivenöl, Rosmarin, Salz'),
 -- Suppe
 ('Minestrone', 'Italienische Gemüsesuppe mit Pasta', 6.90, 'Vorspeise', 'Karotten, Zucchini, Sellerie, Tomaten, Pasta, Bohnen'),
 ('Tomatensuppe', 'Cremige Tomatensuppe mit Basilikum', 5.90, 'Vorspeise', 'Tomaten, Zwiebeln, Knoblauch, Sahne, Basilikum'),
@@ -227,7 +223,6 @@ VALUES
 ('Eistee Zitrone', 'Zitronen-Eistee kalt serviert', 3.20, 'Getränk', 'Wasser, Tee, Zucker, Zitronenaroma'),
 ('Limonade Zitrone', 'Hausgemachte Zitronenlimonade', 3.00, 'Getränk', 'Wasser, Zitronensaft, Zucker'),
 ('Limonade Himbeere', 'Hausgemachte Himbeerlimonade', 3.20, 'Getränk', 'Wasser, Himbeersaft, Zucker'),
-('Orangina', 'Orangensaftgetränk mit Fruchtstückchen', 3.50, 'Getränk', 'Orangensaft, Zucker, Kohlensäure'),
 -- Alkoholische
 ('Bier', 'Klassisches Pils vom Fass', 4.50, 'Getränk', 'Wasser, Malz, Hopfen, Hefe'),
 ('Weißwein', 'Trockener Weißwein aus Italien', 5.50, 'Getränk', 'Weintrauben'),
