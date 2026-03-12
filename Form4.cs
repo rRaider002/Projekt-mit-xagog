@@ -1,522 +1,291 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using MySqlConnector;
-
-namespace Projekt
-{
-    public partial class Form4 : Form
-    {
-        private Form2 _form2;
-        private Form3 _form3;
-        private Form1 _form1;
-
-        public string Buttonname { get; set; }
-
-        public Form4(Form1 form1)
-        {
-            InitializeComponent();
-            this.ControlBox = false;
-            this.MinimizeBox = false;
-            this.MaximizeBox = false;
-            this.FormBorderStyle = FormBorderStyle.Sizable;
-            _form1 = form1;
-
-            tbName.KeyPress += NurBuchstaben_KeyPress;
-            tbName.TextChanged += tbName_TextChanged;
-
-            tBNachname.KeyPress += NurBuchstaben_KeyPress;
-            tBNachname.TextChanged += tBNachname_TextChanged;
-
-            tbTelefonnummer.KeyPress += NurZahlen_KeyPress;
-            tbTelefonnummer.TextChanged += tbTelefonnummer_TextChanged;
-
-            tbPresonen.KeyPress += NurZahlen_KeyPress;
-            tbPresonen.TextChanged += tbPresonen_TextChanged;
-
-            tbTelefonnummer.MaxLength = 20;
-            tbPresonen.MaxLength = 2;
-
-        }
-
-
-        public void NurBuchstaben_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsLetter(e.KeyChar) && !char.IsControl(e.KeyChar) && e.KeyChar != ' ')
-            {
-                e.Handled = true;
-            }
-        }
-
-        public void NurZahlen_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsDigit(e.KeyChar) && !char.IsControl(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void Form4_Load(object sender, EventArgs e)
-        {
-            
-        }
-
-        public void SetOtherForms(Form2 form2, Form3 form3, Form1 form1)
-        {
-            _form2 = form2;
-            _form3 = form3;
-        }
-
-        private string _tischName;
-
-
-        public void SetTischName(string name)
-        {
-            _tischName = name;
-            LadeGastdaten();
-        }
-
-
-        private int GetTischID()
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = "SELECT TischID FROM Tisch WHERE TischName = @name";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@name", _tischName);
-
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null)
-                        return Convert.ToInt32(result);
-                }
-            }
-
-            return -1;
-        }
-
-        private int GetSelectedSlot()
-        {
-            return _form1.GetSelectedSlot();
-        }
-
-        private void LadeGastdaten()
-        {
-            if (string.IsNullOrEmpty(_tischName))
-                return;
-
-            int selectedSlot = GetSelectedSlot();
-            if (selectedSlot == -1)
-                return;
-
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"
-                    SELECT g.Vorname, g.Nachname, g.Telefon, r.Personenanzahl
-                    FROM Reservierung r
-                    INNER JOIN Gast g ON r.GastID = g.GastID
-                    INNER JOIN Tisch t ON r.TischID = t.TischID
-                    WHERE t.TischName = @tischName
-                      AND r.Slot = @slot
-                      AND r.IsDeleted = 0
-                    ORDER BY r.ReservierungID DESC
-                    LIMIT 1";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@tischName", _tischName);
-                    cmd.Parameters.AddWithValue("@slot", selectedSlot);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            tbName.Text = reader["Vorname"].ToString();
-                            tBNachname.Text = reader["Nachname"].ToString();
-                            tbTelefonnummer.Text = reader["Telefon"].ToString();
-                            tbPresonen.Text = reader["Personenanzahl"].ToString();
-                        }
-                        else
-                        {
-                            tbName.Clear();
-                            tBNachname.Clear();
-                            tbTelefonnummer.Clear();
-                            tbPresonen.Clear();
-                        }
-                    }
-                }
-            }
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            LadeGastdaten();
-        }
-
-        private int GetTischPlaetze(int tischID)
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = "SELECT Plaetze FROM Tisch WHERE TischID = @tischID";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@tischID", tischID);
-
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null)
-                        return Convert.ToInt32(result);
-                }
-            }
-
-            return -1;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string nachname = tBNachname.Text;
-
-            int tischID = GetTischID();
-
-            if (tischID == -1)
-            {
-                MessageBox.Show("Tisch nicht gefunden!");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(tbName.Text))
-            {
-                MessageBox.Show("Bitte geben Sie einen Vornamen ein");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(tBNachname.Text))
-            {
-                MessageBox.Show("Bitte geben Sie einen Nachnamen ein");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(tbTelefonnummer.Text))
-            {
-                MessageBox.Show("Bitte geben Sie Ihre Telefonnummer an");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(tbPresonen.Text))
-            {
-                MessageBox.Show("Bitte geben Sie an, wie viele Personen kommen");
-                return;
-            }
-
-            int personenanzahl;
-            if (!int.TryParse(tbPresonen.Text, out personenanzahl))
-            {
-                MessageBox.Show("Bitte geben Sie eine gültige Personenzahl ein");
-                return;
-            }
-
-            int maxPlaetze = GetTischPlaetze(tischID);
-            if (maxPlaetze == -1)
-            {
-                MessageBox.Show("Tischkapazität konnte nicht ermittelt werden.");
-                return;
-            }
-
-            if (personenanzahl > maxPlaetze)
-            {
-                MessageBox.Show($"Dieser Tisch hat nur {maxPlaetze} Plätze.");
-                return;
-            }
-
-            int selectedSlot = GetSelectedSlot();
-
-            if (selectedSlot == -1)
-            {
-                MessageBox.Show("Bitte wählen Sie einen Slot aus.");
-                return;
-            }
-
-            if (IstTischReserviert(tischID, selectedSlot))
-            {
-                MessageBox.Show("Dieser Slot ist schon reserviert");
-                return;
-            }
-
-            int gastID = SaveGastToDatabase(tbName.Text, tBNachname.Text, tbTelefonnummer.Text);
-            SaveReservierungToDatabase(dateTimePicker1.Value.Date, selectedSlot, personenanzahl, gastID, tischID);
-
-            UpdateTischStatus();
-            _form1.LadeTischStatus();
-
-            tbName.Clear();
-            tBNachname.Clear();
-            tbTelefonnummer.Clear();
-            tbPresonen.Clear();
-
-            this.Hide();
-        }
-
-
-
-        private bool IstTischReserviert(int tischID, int slot)
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"
-                SELECT COUNT(*)
-                FROM Reservierung
-                WHERE TischID = @tischID
-                AND Slot = @slot
-                AND IsDeleted = 0
-                AND TIMESTAMP(Datum, Uhrzeit) <= NOW()
-                AND TIMESTAMP(Datum, Uhrzeit) + INTERVAL 2 HOUR > NOW()";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@tischID", tischID);
-                    cmd.Parameters.AddWithValue("@slot", slot);
-
-                    int count = Convert.ToInt32(cmd.ExecuteScalar());
-                    return count > 0;
-                }
-            }
-        }
-
-
-        private int SaveGastToDatabase(string name, string nachname, string telefon)
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"INSERT INTO Gast (Vorname, Nachname, Telefon) 
-                         VALUES (@Vorname, @Nachname, @Telefon);
-                         SELECT LAST_INSERT_ID();";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Vorname", name);
-                    cmd.Parameters.AddWithValue("@Nachname", nachname);
-                    cmd.Parameters.AddWithValue("@Telefon", telefon);
-
-                    return Convert.ToInt32(cmd.ExecuteScalar());
-                }
-            }
-        }
-
-        private void SaveReservierungToDatabase(DateTime datum, int slot, int personenanzahl, int gastID, int tischID)
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"INSERT INTO Reservierung 
-                    (Datum, Uhrzeit, Slot, Personenanzahl, GastID, TischID, IsDeleted)
-                    VALUES
-                    (@Datum, @Uhrzeit, @Slot, @Personenanzahl, @GastID, @TischID, 0)";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@Datum", datum);
-                    cmd.Parameters.AddWithValue("@Uhrzeit", dateTimePicker2.Value.TimeOfDay);
-                    cmd.Parameters.AddWithValue("@Slot", slot);
-                    cmd.Parameters.AddWithValue("@Personenanzahl", personenanzahl);
-                    cmd.Parameters.AddWithValue("@GastID", gastID);
-                    cmd.Parameters.AddWithValue("@TischID", tischID);
-
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-
-        private void UpdateTischStatus()
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"
-                UPDATE Tisch
-                SET istBesetzt = 1,
-                Slot = CASE
-                      WHEN Slot < 4 THEN Slot + 1
-                      ELSE Slot
-                   END
-                WHERE TischName = @name";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@name", _tischName);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        private void ReservierungFreigeben(int tischID)
-        {
-            int selectedSlot = GetSelectedSlot();
-            if (selectedSlot == -1)
-                return;
-
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"DELETE FROM Reservierung
-                         WHERE TischID = @tischID
-                         AND Datum = @datum
-                         AND Slot = @slot";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@tischID", tischID);
-                    cmd.Parameters.AddWithValue("@datum", dateTimePicker1.Value.Date);
-                    cmd.Parameters.AddWithValue("@slot", selectedSlot);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-        private void button2_Click(object sender, EventArgs e)
-        {
-            int tischID = GetTischID();
-
-            if (tischID == -1)
-            {
-                MessageBox.Show("Tisch nicht gefunden!");
-                return;
-            }
-
-            ReservierungFreigeben(tischID);
-            TischFreigeben();
-
-            tbName.Clear();
-            tBNachname.Clear();
-            tbTelefonnummer.Clear();
-            tbPresonen.Clear();
-
-            _form1.LadeTischStatus();
-            this.Hide();
-        }
-
-        private void TischFreigeben()
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = @"UPDATE Tisch
-                         SET istBesetzt = 0
-                         WHERE TischName = @name";
-
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@name", _tischName);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }   
-
-
-        private bool KannReservieren(int tischID)
-        {
-            string connStr = "server=localhost;user=root;password=root;database=vesuv";
-
-            using (MySqlConnection conn = new MySqlConnection(connStr))
-            {
-                conn.Open();
-
-                string query = "SELECT Slot FROM Tisch WHERE TischID = @tischID";
-                using (MySqlCommand cmd = new MySqlCommand(query, conn))
-                {
-                    cmd.Parameters.AddWithValue("@tischID", tischID);
-                    object result = cmd.ExecuteScalar();
-
-                    if (result != null)
-                    {
-                        int slot = Convert.ToInt32(result);
-                        return slot < 4;
-                    }
-
-                    return false; 
-                }
-            }
-        }
-
-
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-            dateTimePicker1.Format = DateTimePickerFormat.Short;
-        }
-
-
-        private void dateTimePicker2_ValueChanged_1(object sender, EventArgs e)
-        {
-            dateTimePicker2.Format = DateTimePickerFormat.Custom;
-            dateTimePicker2.CustomFormat = "HH:mm";
-            dateTimePicker2.ShowUpDown = true;
-        }
-
-        private void tbName_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            _form3.Show();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-        }
-
-        private void tbPresonen_TextChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void tbTelefonnummer_TextChanged(object sender, EventArgs e)
-        {
-        }
-
-        private void tBNachname_TextChanged(object sender, EventArgs e)
-        {
-        }
-    }
-}
+CREATE DATABASE vesuv;
+USE vesuv;
+
+
+-- =========================
+-- GAST
+-- =========================
+CREATE TABLE Gast (
+  GastID INT AUTO_INCREMENT PRIMARY KEY,
+  Vorname VARCHAR(50) NOT NULL,
+  Nachname VARCHAR(50) NOT NULL,
+  Telefon VARCHAR(30) NOT NULL,
+  IsDeleted BOOLEAN DEFAULT 0
+);
+
+-- =========================
+-- MITARBEITER
+-- =========================
+CREATE TABLE Mitarbeiter (
+  MitarbeiterID INT AUTO_INCREMENT PRIMARY KEY,
+  Vorname VARCHAR(20) NOT NULL,
+  Nachname VARCHAR(20) NOT NULL,
+  Telefon VARCHAR(20),
+  passwort_hash VARCHAR(255) NOT NULL,
+  geburtsjahr YEAR,
+  bereich VARCHAR(25),
+  IsDeleted BOOLEAN DEFAULT 0
+);
+
+-- =========================
+-- TISCH
+-- =========================
+CREATE TABLE Tisch (
+  TischID INT AUTO_INCREMENT PRIMARY KEY,
+  TischName VARCHAR(15) NOT NULL UNIQUE,
+  Plaetze INT NOT NULL,
+  Lage VARCHAR(50),
+  istBesetzt BOOLEAN DEFAULT 0, 
+  Slot INT DEFAULT 0,
+  KellnerID INT NOT NULL,
+  FOREIGN KEY (KellnerID) REFERENCES Mitarbeiter(MitarbeiterID)
+);
+
+-- =========================
+-- SPEISE
+-- =========================
+CREATE TABLE Speise (
+  SpeiseID INT AUTO_INCREMENT PRIMARY KEY,
+  Bezeichnung VARCHAR(100) NOT NULL,
+  Beschreibung VARCHAR(255),
+  Preis DECIMAL(6,2) NOT NULL,
+  SpeiseType VARCHAR(25),
+  Kategorie varchar(25),
+  Zutaten VARCHAR(100),
+  IsDeleted BOOLEAN DEFAULT 0
+);
+
+-- =========================
+-- RESERVIERUNG
+-- =========================
+CREATE TABLE Reservierung (
+  ReservierungID INT AUTO_INCREMENT PRIMARY KEY,
+  TischID INT NOT NULL,
+  Slot INT NOT NULL,
+  GastID INT NOT NULL,
+  Datum DATE NOT NULL,
+  Uhrzeit TIME NOT NULL,
+  Personenanzahl INT NOT NULL,
+  IsDeleted BOOLEAN DEFAULT 0,
+
+  FOREIGN KEY (GastID) REFERENCES Gast(GastID),
+  FOREIGN KEY (TischID) REFERENCES Tisch(TischID)
+);	
+
+SELECT TischID, TischName FROM Tisch;
+
+
+-- =========================
+-- BESTELLUNG (Kopf)
+-- =========================
+CREATE TABLE Bestellung (
+  BestellungID INT AUTO_INCREMENT PRIMARY KEY,
+  Zeitpunkt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  TischID INT NOT NULL,
+  MitarbeiterID INT NOT NULL,
+  GastID INT NOT NULL,
+
+  FOREIGN KEY (TischID) REFERENCES Tisch(TischID),
+  FOREIGN KEY (MitarbeiterID) REFERENCES Mitarbeiter(MitarbeiterID),
+  FOREIGN KEY (GastID) REFERENCES Gast(GastID)
+);
+
+
+
+-- =========================
+-- BESTELLPOSITION (Positionen)
+-- =========================
+CREATE TABLE Bestellposition (
+  BestellpositionID INT AUTO_INCREMENT PRIMARY KEY,
+  BestellungID INT NOT NULL,
+  SpeiseID INT NOT NULL,
+  Menge INT NOT NULL DEFAULT 1,
+  Einzelpreis DECIMAL(6,2) NOT NULL,
+
+  FOREIGN KEY (BestellungID) REFERENCES Bestellung(BestellungID),
+  FOREIGN KEY (SpeiseID) REFERENCES Speise(SpeiseID)
+);
+
+SELECT 
+    B.BestellungID AS 'Nr', 
+    DATE_FORMAT(B.Zeitpunkt, '%H:%i') AS 'Uhrzeit', 
+    T.TischName AS 'Tisch', 
+    SUM(BP.Menge * BP.Einzelpreis) AS 'Summe'
+FROM Bestellung B
+JOIN Tisch T ON B.TischID = T.TischID
+JOIN Bestellposition BP ON B.BestellungID = BP.BestellungID
+WHERE DATE(B.Zeitpunkt) = CURDATE()
+GROUP BY B.BestellungID, B.Zeitpunkt, T.TischName 
+ORDER BY B.Zeitpunkt DESC;
+
+INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort_hash,geburtsjahr, bereich)
+VALUES
+-- Manager
+('Julian','Hillebrecht','01234567890','530423','2007','Manager'),
+('Isa','Dagli','01234567890','4002','2004','Manager'),
+-- Köche
+('Max', 'Mustermann', '01234567890', 'Max718', 1985,'Koch'),
+('Anna', 'Schmidt', '09876543210', 'Anna812', 1990,'Koch'),
+('Tom', 'Becker', '01555123456', 'Tom123', 1982,'Koch'),
+('Laura', 'Fischer', '01777654321', 'Laura781', 1995,'Koch'),
+-- Kellner
+('Sophie', 'Neumann', '01666111222', 'Sophie123', 1988,'Kellner'),
+('Lukas', 'Keller', '01666333444', 'Lukas456', 1991,'Kellner'),
+('Julia', 'Hoffmann', '01666555666', 'Julia789', 1983,'Kellner'),
+('Fabian', 'Wolf', '01666777888', 'Fabian321', 1987,'Kellner'),
+('Nina', 'Richter', '01666999000', 'Nina654', 1992,'Kellner');
+
+	
+
+
+INSERT INTO Tisch (TischName, Plaetze, Lage, KellnerID)
+VALUES
+('Tisch1',2,'Fenster',7),
+('Tisch2',2,'Fenster',7),
+('Tisch3',2,'Fenster',7),
+('Tisch4',2,'Fenster',7),
+('Tisch5',2,'Fenster',7),
+('Tisch6',2,'Innenraum',7),
+('Tisch7',2,'Innenraum',7),
+('Tisch8',2,'Fenster',7),
+('Tisch9',4,'Innenraum',8),
+('Tisch10',4,'Innenraum',8),
+('Tisch11',4,'Innenraum',8),
+('Tisch12',4,'Innenraum',8),
+('Tisch13',4,'Innenraum',8),
+('Tisch14',4,'Innenraum',8),
+('Tisch15',4,'Innenraum',8),
+('Tisch16',4,'Innenraum',8),
+('Tisch17',4,'Innenraum',9),
+('Tisch18',4,'Innenraum',9),
+('Tisch19',4,'Innenraum',9),
+('Tisch20',4,'Innenraum',9),
+('Tisch21',4,'Innenraum',9),
+('Tisch22',4,'Innenraum',9),
+('Tisch23',4,'Innenraum',9),
+('Tisch24',4,'Innenraum',9),
+('Tisch25',10,'Fenster',10),
+('Tisch26',10,'Fenster',10),
+('Tisch27',10,'Fenster',10),
+('Tisch28',10,'Fenster',10),
+('Tisch29',4,'Fenster',10),
+('Tisch30',4,'Fenster',10),
+('Tisch31',4,'Fenster',10),
+('Tisch32',4,'Fenster',10),
+('Tisch33',8,'Fenster',11),
+('Tisch34',8,'Fenster',11),
+('Tisch35',8,'Fenster',11),
+('Tisch36',8,'Innenraum',11),
+('Tisch37',8,'Fenster',11),
+('Tisch38',8,'Innenraum',11),
+('Tisch39',8,'Fenster',11),
+('Tisch40',8,'Fenster',11);
+
+
+INSERT INTO Speise (Bezeichnung, Beschreibung, Preis, SpeiseType, Kategorie, Zutaten)
+VALUES 
+-- Speisen
+
+-- PIZZA
+('Margherita', 'Pizza mit Tomaten und Mozzarella', 8.90, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Basilikum'),
+('Salami', 'Pizza mit Tomatensauce, Mozzarella und Salami', 9.50, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Salami'),
+('Prosciutto', 'Pizza mit Tomatensauce, Mozzarella und Kochschinken', 9.80, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Kochschinken'),
+('Funghi', 'Pizza mit Tomatensauce, Mozzarella und Champignons', 9.20, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Champignons'),
+('Hawaii', 'Pizza mit Schinken und Ananas', 10.00, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Schinken, Ananas'),
+('Quattro Stagioni', 'Pizza mit vier verschiedenen Belägen', 11.50, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, Schinken, Artischocken, Oliven, Champignons'),
+('Quattro Formaggi', 'Pizza mit vier Käsesorten', 10.90, 'Hauptgericht','Pizza', 'Mozzarella, Gorgonzola, Parmesan, Emmentaler'),
+('Diavola', 'Scharfe Pizza mit Salami und Chili', 10.50, 'Hauptgericht','Pizza', 'Tomaten, Mozzarella, scharfe Salami, Chili'),
+-- Pasta
+('Spaghetti Bolognese', 'Pasta mit Rinderhackfleisch-Tomatensauce', 11.50, 'Hauptgericht','Pasta', 'Spaghetti, Rinderhackfleisch, Tomaten, Zwiebeln'),
+('Spaghetti Carbonara', 'Pasta mit Ei, Käse und Speck', 12.00, 'Hauptgericht','Pasta', 'Spaghetti, Ei, Pecorino, Speck'),
+('Penne Arrabbiata', 'Pasta mit scharfer Tomatensauce', 10.50, 'Hauptgericht','Pasta', 'Penne, Tomaten, Knoblauch, Chili'),
+('Lasagne al Forno', 'Überbackene Lasagne mit Fleischragù', 13.50, 'Hauptgericht','Pasta', 'Lasagneplatten, Rinderhackfleisch, Tomaten, Béchamelsauce'),
+('Tagliatelle al Pesto', 'Bandnudeln mit Basilikum-Pesto', 11.00, 'Hauptgericht','Pasta', 'Tagliatelle, Basilikum, Pinienkerne, Parmesan, Olivenöl'),
+-- Salat
+('Caesar Salat', 'Römersalat mit Caesar-Dressing und Croutons', 9.50, 'Vorspeise','Salat', 'Römersalat, Croutons, Parmesan, Caesar-Dressing'),
+('Griechischer Salat', 'Salat mit Feta und Oliven', 8.90, 'Vorspeise','Salat', 'Tomaten, Gurken, Feta, Oliven, Zwiebeln'),
+('Gemischter Salat', 'Bunter Salat mit verschiedenen Blattsalaten', 7.50, 'Vorspeise','Salat', 'Blattsalat, Tomaten, Gurken, Karotten'),
+('Thunfischsalat', 'Salat mit Thunfisch und Zwiebeln', 9.80, 'Vorspeise','Salat', 'Blattsalat, Thunfisch, Zwiebeln, Oliven'),
+('Caprese', 'Tomaten mit Mozzarella und Basilikum', 8.50, 'Vorspeise','Salat', 'Tomaten, Mozzarella, Basilikum, Olivenöl'),
+('Hähnchensalat', 'Salat mit gegrilltem Hähnchenbrustfilet', 10.90, 'Hauptgericht','Salat', 'Blattsalat, Hähnchenbrust, Tomaten, Gurken'),
+('Rucolasalat', 'Rucola mit Parmesan und Kirschtomaten', 8.20, 'Vorspeise','Salat', 'Rucola, Parmesan, Kirschtomaten, Balsamico'),
+-- Antipasti
+('Bruschetta', 'Geröstetes Brot mit Tomaten und Basilikum', 6.50, 'Vorspeise','Antipasti', 'Baguette, Tomaten, Basilikum, Olivenöl, Knoblauch'),
+('Vitello Tonnato', 'Kalbfleisch mit Thunfischsauce', 11.50, 'Vorspeise','Antipasti', 'Kalbfleisch, Thunfisch, Kapern, Mayonnaise'),
+('Carpaccio', 'Hauchdünnes Rindfleisch mit Parmesan', 12.00, 'Vorspeise','Antipasti', 'Rinderfilet, Parmesan, Rucola, Olivenöl'),
+('Antipasti Misti', 'Gemischte italienische Vorspeisenplatte', 13.50, 'Vorspeise','Antipasti', 'Gegrilltes Gemüse, Oliven, Salami, Käse'),
+('Gegrillte Zucchini', 'Marinierte und gegrillte Zucchinischeiben', 7.20, 'Vorspeise','Antipasti', 'Zucchini, Olivenöl, Knoblauch, Kräuter'),
+('Gegrillte Paprika', 'Marinierte Paprika mit Olivenöl', 7.20, 'Vorspeise','Antipasti', 'Paprika, Olivenöl, Knoblauch, Kräuter'),
+-- Suppe
+('Minestrone', 'Italienische Gemüsesuppe mit Pasta', 6.90, 'Vorspeise','Suppe', 'Karotten, Zucchini, Sellerie, Tomaten, Pasta, Bohnen'),
+('Tomatensuppe', 'Cremige Tomatensuppe mit Basilikum', 5.90, 'Vorspeise','Suppe', 'Tomaten, Zwiebeln, Knoblauch, Sahne, Basilikum'),
+('Zucchinisuppe', 'Feine Suppe aus frischer Zucchini', 6.50, 'Vorspeise','Suppe', 'Zucchini, Zwiebeln, Kartoffeln, Gemüsebrühe'),
+('Kartoffelsuppe', 'Herzhafte Suppe mit Kartoffeln und Gemüse', 6.50, 'Vorspeise','Suppe', 'Kartoffeln, Karotten, Lauch, Sellerie, Sahne'),
+('Hühnersuppe', 'Klassische Suppe mit Huhn und Gemüse', 7.50, 'Vorspeise','Suppe', 'Hühnerfleisch, Karotten, Sellerie, Nudeln, Petersilie'),
+('Gulaschsuppe', 'Würzige Rindfleischsuppe mit Paprika', 8.50, 'Vorspeise','Suppe', 'Rindfleisch, Paprika, Zwiebeln, Kartoffeln, Paprikapulver'),
+
+-- Getränke
+
+-- Alkoholfrei
+('Orangensaft', 'Frisch gepresster Orangensaft', 3.80, 'Getränk','Alkoholfrei', 'Orangensaft'),
+('Cola', 'Klassische Cola', 2.90, 'Getränk','Alkoholfrei', 'Wasser, Zucker, Kohlensäure, Karamell, Aromen'),
+('Fanta', 'Erfrischende Orangenlimonade', 2.90, 'Getränk','Alkoholfrei', 'Wasser, Zucker, Kohlensäure, Orangenaroma'),
+('Sprite', 'Zitronen-Limetten-Limonade', 2.90, 'Getränk','Alkoholfrei', 'Wasser, Zucker, Kohlensäure, Zitronen- und Limettenaroma'),
+('Mineralwasser', 'Sprudelndes Mineralwasser', 2.50, 'Getränk','Alkoholfrei', 'Mineralwasser'),
+('Stillwasser', 'Ohne Kohlensäure', 2.50, 'Getränk','Alkoholfrei', 'Mineralwasser'),
+('Eistee Pfirsich', 'Pfirsich-Eistee kalt serviert', 3.20, 'Getränk','Alkoholfrei', 'Wasser, Tee, Zucker, Pfirsicharoma'),
+('Eistee Zitrone', 'Zitronen-Eistee kalt serviert', 3.20, 'Getränk','Alkoholfrei', 'Wasser, Tee, Zucker, Zitronenaroma'),
+('Limonade Zitrone', 'Hausgemachte Zitronenlimonade', 3.00, 'Getränk','Alkoholfrei', 'Wasser, Zitronensaft, Zucker'),
+('Limonade Himbeere', 'Hausgemachte Himbeerlimonade', 3.20, 'Getränk','Alkoholfrei', 'Wasser, Himbeersaft, Zucker'),
+-- Alkoholische
+('Bier', 'Klassisches Pils vom Fass', 4.50, 'Getränk','Alkoholische', 'Wasser, Malz, Hopfen, Hefe'),
+('Weißwein', 'Trockener Weißwein aus Italien', 5.50, 'Getränk','Alkoholische', 'Weintrauben'),
+('Rotwein', 'Trockener Rotwein aus Italien', 5.50, 'Getränk','Alkoholische', 'Weintrauben'),
+('Prosecco', 'Italienischer Schaumwein', 6.00, 'Getränk','Alkoholische', 'Weintrauben, Kohlensäure'),
+('Aperol Spritz', 'Aperol, Prosecco und Soda', 7.50, 'Getränk','Alkoholische', 'Aperol, Prosecco, Soda, Orangenscheibe'),
+('Campari Soda', 'Bitterer Campari mit Soda', 6.50, 'Getränk','Alkoholische', 'Campari, Soda, Eis'),
+('Hugo', 'Prosecco, Holunderblütensirup und Minze', 7.00, 'Getränk','Alkoholische', 'Prosecco, Holunderblütensirup, Minze, Soda'),
+('Gin Tonic', 'Gin mit Tonic Water', 8.00, 'Getränk','Alkoholische', 'Gin, Tonic Water, Limette, Eiswürfel'),
+
+-- Dessert
+('Tiramisu', 'Italienisches Dessert mit Mascarpone und Kaffee', 6.50, 'Dessert','Dessert', 'Mascarpone, Kaffee, Löffelbiskuit, Zucker, Eier, Kakao'),
+('Panna Cotta', 'Cremige Vanille-Pudding-Spezialität', 5.90, 'Dessert','Dessert', 'Sahne, Zucker, Vanille, Gelatine, Beeren'),
+('Gelato', 'Italienisches Speiseeis', 4.50, 'Dessert','Dessert', 'Milch, Zucker, Eigelb, Vanille, Fruchtaromen'),
+('Profiteroles', 'Brandteigkugeln gefüllt mit Sahne und Schokolade', 6.80,'Dessert', 'Dessert', 'Brandteig, Sahne, Schokolade'),
+('Creme Brûlée', 'Karamellisierte Vanillecreme', 6.90, 'Dessert','Dessert', 'Sahne, Zucker, Eigelb, Vanille'),
+('Obstsalat', 'Frischer Obstsalat der Saison', 5.50, 'Dessert','Dessert', 'Äpfel, Birnen, Trauben, Kiwi, Orange, Honig');
+
+
+-- Umsatz Tag
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS TagesUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE DATE(Bestellung.Zeitpunkt) = CURDATE();
+
+
+-- Umsatz Woche
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS WochenUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEARWEEK(Bestellung.Zeitpunkt, 1) = YEARWEEK(CURDATE(), 1);
+
+
+-- Umsatz Monat
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS MonatsUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEAR(Bestellung.Zeitpunkt) = YEAR(CURDATE())
+AND MONTH(Bestellung.Zeitpunkt) = MONTH(CURDATE());
+  
+  
+-- Umsatz Jahr  
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS JahresUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID
+WHERE YEAR(Bestellung.Zeitpunkt) = YEAR(CURDATE());
+
+
+-- Umsatz Insgesant
+SELECT SUM(Bestellposition.Menge * Bestellposition.Einzelpreis) AS GesamtUmsatz
+FROM Bestellung
+JOIN Bestellposition ON Bestellung.BestellungID = Bestellposition.BestellungID;
