@@ -21,7 +21,7 @@ CREATE TABLE Mitarbeiter (
   Vorname VARCHAR(20) NOT NULL,
   Nachname VARCHAR(20) NOT NULL,
   Telefon VARCHAR(20),
-  passwort_hash VARCHAR(255) NOT NULL,
+  passwort VARCHAR(255) NOT NULL,
   geburtsjahr YEAR,
   bereich VARCHAR(25),
   IsDeleted BOOLEAN DEFAULT 0
@@ -123,7 +123,7 @@ WHERE DATE(B.Zeitpunkt) = CURDATE()
 GROUP BY B.BestellungID, B.Zeitpunkt, T.TischName 
 ORDER BY B.Zeitpunkt DESC;
 
-INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort_hash,geburtsjahr, bereich)
+INSERT INTO Mitarbeiter (Vorname ,Nachname,Telefon,passwort,geburtsjahr, bereich)
 VALUES
 -- Manager
 ('Julian','Hillebrecht','01234567890','530423','2007','Manager'),
