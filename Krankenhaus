@@ -1,0 +1,72 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using MySqlConnector;
+
+namespace Krankenhaus
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            PatientenDatenLaden();
+            KrankheitenLaden();
+        }
+
+        private void PatientenDatenLaden()
+        {
+            string connStr = DB.connStr;
+            string query = "Select Vorname, Nachname,RaumID From Patienten";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlCommand cmd = new MySqlCommand(query,conn))
+            {
+                conn.Open();
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    dgvOverview.DataSource = dataTable;
+                }
+            }
+        }
+
+        private void KrankheitenLaden()
+        {
+            string connStr = DB.connStr;
+            string query = "Select Krankheit, RaumID From Raum";
+
+            using (MySqlConnection conn = new MySqlConnection(connStr))
+            using (MySqlCommand cmd = new MySqlCommand(query, conn))
+            {
+                conn.Open();
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    DataTable dataTable = new DataTable();
+                    dataTable.Load(reader);
+
+                    comboBox1.DataSource = dataTable;
+
+                    comboBox1.DisplayMember = "Krankheit";
+                    comboBox1.ValueMember = "RaumID";
+                }
+            }
+        }
+
+
+
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
